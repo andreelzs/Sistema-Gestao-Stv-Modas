@@ -1,61 +1,82 @@
+# Dentro do arquivo: pedidos/models.py
+
+from datetime import date
 from django.db import models
-from django.conf import settings
+from clientes.models import Cliente
+from produtos.models import VariacaoProduto
 
-
-class Tarefa(models.Model):
-    STATUS_TAREFA = [
-        ('PEND', 'Pendente'),
-        ('FAZE', 'Sendo feita'),
-        ('CONC', 'Concluída'),
-        ('CANC', 'Cancelada'), 
+class Pedido(models.Model):
+    
+    FORMAS_PAGAMENTO_CHOICES = [
+        ('PIX', 'PIX'),
+        ('CARTAO_CREDITO', 'Cartão de Crédito'),
+        ('CARTAO_DEBITO', 'Cartão de Débito'),
+        ('DINHEIRO', 'Dinheiro'),
+        ('CREDIARIO', 'Crediário'),
     ]
 
-    PRIORIDADE_TAREFA = [
-        (1, 'Baixa'),
-        (2, 'Média'),
-        (3, 'Alta'),
-        (4, 'Urgente'),
+    STATUS_PEDIDO_CHOICES = [
+        ('AGUARDANDO_PAGAMENTO', 'Aguardando Pagamento'),
+        ('EM_SEPARACAO', 'Em Separação'),
+        ('PRONTO_PARA_ENTREGA', 'Pronto para Entrega'),
+        ('ENTREGUE', 'Entregue'),
+        ('CANCELADO', 'Cancelado'),
     ]
 
-    titulo = models.CharField(max_length=200, verbose_name='Título da Tarefa')
-    descricao = models.TextField(verbose_name='Descrição Detalhada')
-    status = models.CharField(
-        max_length=4,
-        choices=STATUS_TAREFA,
-        default='PEND',
-        verbose_name='Status'
-    )
-    prioridade = models.IntegerField(
-        choices=PRIORIDADE_TAREFA,
-        default=2, 
-        verbose_name='Prioridade'
-    )
-    data_criacao = models.DateTimeField(auto_now_add=True, verbose_name='Data de Criação')
-    data_prevista_conclusao = models.DateField(blank=True, null=True, verbose_name='Prazo de Entrega')
-    data_conclusao_efetiva = models.DateField(blank=True, null=True, verbose_name='Data de Conclusão Efetiva')
-    
-    voluntarios_responsaveis = models.ManyToManyField(
-        'voluntarios.Voluntario',
-        blank=True, # Uma tarefa pode ser criada sem voluntários inicialmente
-        related_name='tarefas_responsaveis', # Novo related_name para evitar conflitos
-        verbose_name='Voluntários Responsáveis'
-    )
-    
-    atribuido_por = models.ForeignKey(
-        settings.AUTH_USER_MODEL, # Usuário do sistema (Colaborador/Admin) que atribuiu
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True, # Pode ser uma tarefa criada pelo próprio voluntário ou sistema
-        related_name='tarefas_criadas',
-        verbose_name='Atribuído Por'
-    )
-    
-    observacoes = models.TextField(blank=True, null=True, verbose_name='Observações Adicionais')
+    cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT, related_name='pedidos')
+    data_pedido = models.DateTimeField(auto_now_add=True)
+    valor_total = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    forma_pagamento = models.CharField(max_length=50, choices=FORMAS_PAGAMENTO_CHOICES)
+    status = models.CharField(max_length=50, choices=STATUS_PEDIDO_CHOICES, default='AGUARDANDO_PAGAMENTO')
 
     class Meta:
-        verbose_name = 'Tarefa'
-        verbose_name_plural = 'Tarefas'
-        ordering = ['-prioridade', 'data_prevista_conclusao', 'titulo'] # Ordenar por prioridade (maior primeiro), depois prazo
+        verbose_name = "Pedido"
+        verbose_name_plural = "Pedidos"
+        ordering = ['-data_pedido']
 
     def __str__(self):
-        return f"{self.titulo} ({self.get_status_display()})"
+        return f"Pedido #{self.id} - {self.cliente.nome_completo}"
+
+class ItemPedido(models.Model):
+    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, related_name='itens')
+    variacao_produto = models.ForeignKey(VariacaoProduto, on_delete=models.PROTECT)
+    quantidade = models.PositiveIntegerField()
+    preco_unitario = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        verbose_name = "Item do Pedido"
+        verbose_name_plural = "Itens do Pedido"
+
+    def __str__(self):
+        return f"{self.quantidade}x {self.variacao_produto.produto_base.nome}"
+
+class Parcela(models.Model):
+
+    STATUS_PARCELA_CHOICES = [
+        ('PENDENTE', 'Pendente'),
+        ('PAGA', 'Paga'),
+    ]
+
+    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, related_name='parcelas')
+    numero_parcela = models.IntegerField()
+    valor = models.DecimalField(max_digits=10, decimal_places=2)
+    data_vencimento = models.DateField()
+    status = models.CharField(max_length=20, choices=STATUS_PARCELA_CHOICES, default='PENDENTE')
+
+    class Meta:
+        verbose_name = "Parcela"
+        verbose_name_plural = "Parcelas"
+        unique_together = ('pedido', 'numero_parcela')
+
+    def __str__(self):
+        return f"Parcela {self.numero_parcela} do Pedido #{self.pedido.id}"
+
+    @property
+    def esta_atrasada(self):
+        """
+        Retorna True se a parcela estiver com status 'PENDENTE' 
+        e a data de vencimento já passou.
+        """
+        if self.status == 'PENDENTE' and self.data_vencimento < date.today():
+            return True
+        return False
