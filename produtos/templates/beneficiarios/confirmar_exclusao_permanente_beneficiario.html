@@ -1,0 +1,27 @@
+{% extends "core/base.html" %}
+
+{% block title %}Confirmar Exclusão Permanente - {{ beneficiario.nome_completo }}{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card border-danger">
+        <div class="card-header bg-danger text-white">
+            <h1 class="mb-0">Confirmar Exclusão Permanente</h1>
+        </div>
+        <div class="card-body">
+            <p class="lead">Você tem certeza que deseja excluir permanentemente o beneficiário <strong>{{ beneficiario.nome_completo }}</strong>?</p>
+            <p class="text-danger"><strong>Atenção:</strong> Esta ação é irreversível e todos os dados associados a este beneficiário serão removidos do banco de dados. Não será possível recuperar essas informações.</p>
+            
+            <form method="post" action="{% url 'beneficiarios:excluir_permanente_beneficiario' beneficiario.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash-alt"></i> Sim, excluir permanentemente
+                </button>
+                <a href="{% url 'beneficiarios:listar_beneficiarios' %}?filtro_ativo=inativos" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
