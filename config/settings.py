@@ -110,7 +110,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'gerenciamento_ong.wsgi.application'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Database
