@@ -9,7 +9,7 @@ class Pedido(models.Model):
     
     FORMAS_PAGAMENTO_CHOICES = [
         ('PIX', 'PIX'),
-        ('CARTAO_CREDITO', 'Cartão de Crédito'),
+        ('CARTAO_CREDITO', 'Cartão de Crédito'),    
         ('CARTAO_DEBITO', 'Cartão de Débito'),
         ('DINHEIRO', 'Dinheiro'),
         ('CREDIARIO', 'Crediário'),
