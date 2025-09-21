@@ -38,3 +38,9 @@ class ProdutoBaseAdmin(admin.ModelAdmin):
 class CategoriaAdmin(admin.ModelAdmin):
     list_display = ('nome',)
     search_fields = ('nome',)
+
+# Adicione esta classe se ela não existir
+@admin.register(VariacaoProduto)
+class VariacaoProdutoAdmin(admin.ModelAdmin):
+    list_display = ('__str__', 'estoque')
+    search_fields = ('produto_base__nome', 'cor__nome', 'tamanho__nome') # Linha importante!
