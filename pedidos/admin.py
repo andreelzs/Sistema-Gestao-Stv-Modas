@@ -1,18 +1,23 @@
+# Dentro do ficheiro: pedidos/admin.py
+
 from django import forms
 from django.contrib import admin
 from .models import Pedido, ItemPedido, Parcela
-from produtos.models import ProdutoBase, VariacaoProduto
+from produtos.models import ProdutoBase
 from dateutil.relativedelta import relativedelta
 
-# --- Formulário Personalizado para o Item do Pedido ---
+# --- Formulário Personalizado para o Item do Pedido (CORRIGIDO) ---
+
 class ItemPedidoForm(forms.ModelForm):
     produto_base = forms.ModelChoiceField(
-        queryset=ProdutoBase.objects.filter(ativo=True),
+        queryset=ProdutoBase.objects.filter(ativo=True).order_by('nome'),
         label='Produto',
+        required=False,
         widget=forms.Select(attrs={'class': 'item-produto-base'})
     )
-    cor = forms.ChoiceField(label='Cor', required=False, widget=forms.Select(attrs={'class': 'item-cor'}))
-    tamanho = forms.ChoiceField(label='Tamanho', required=False, widget=forms.Select(attrs={'class': 'item-tamanho'}))
+    # Estes campos serão preenchidos dinamicamente pelo JavaScript.
+    cor = forms.ChoiceField(label='Cor', required=False, choices=[('', '---')], widget=forms.Select(attrs={'class': 'item-cor'}))
+    tamanho = forms.ChoiceField(label='Tamanho', required=False, choices=[('', '---')], widget=forms.Select(attrs={'class': 'item-tamanho'}))
 
     class Meta:
         model = ItemPedido
@@ -21,17 +26,20 @@ class ItemPedidoForm(forms.ModelForm):
             'variacao_produto': forms.HiddenInput(),
         }
 
-
 class ItemPedidoInline(admin.TabularInline):
     model = ItemPedido
     form = ItemPedidoForm
     extra = 1
 
-# --- O resto do admin ---
+# --- Admin para Parcelas ---
+
 class ParcelaInline(admin.TabularInline):
     model = Parcela
     extra = 0
-    readonly_fields = ('numero_parcela', 'valor', 'data_vencimento', 'status')
+    # Adicionamos 'esta_atrasada' para visualização, se desejado
+    readonly_fields = ('numero_parcela', 'valor', 'data_vencimento', 'status', 'esta_atrasada')
+
+# --- Formulário para Pedidos ---
 
 class PedidoAdminForm(forms.ModelForm):
     numero_de_parcelas = forms.IntegerField(
@@ -51,6 +59,7 @@ class PedidoAdminForm(forms.ModelForm):
         model = Pedido
         fields = '__all__'
 
+# --- Admin Principal para Pedidos ---
 
 @admin.register(Pedido)
 class PedidoAdmin(admin.ModelAdmin):
@@ -74,52 +83,53 @@ class PedidoAdmin(admin.ModelAdmin):
         js = ('pedidos/js/pedido_admin.js',)
 
     def save_formset(self, request, form, formset, change):
-        # LÓGICA DE ESTOQUE AVANÇADA
+        # --- LÓGICA DE STOCK AVANÇADA COM COMENTÁRIOS ---
         
-        # Primeiro, lidamos com os itens que foram marcados para exclusão
+        # ETAPA 1: Lidar com itens removidos do pedido.
+        # O Django coloca os formulários marcados para exclusão em `formset.deleted_forms`.
+        # Percorremos cada um deles para devolver o seu stock.
         for form_item in formset.deleted_forms:
-            if form_item.instance.pk: # Se o item realmente existia na base de dados
+            if form_item.instance.pk: # Confirma que o item realmente existia e não era apenas uma linha em branco.
                 item_original = form_item.instance
-                # Devolve a quantidade ao stock
+                # Devolve a quantidade do item removido de volta para o stock da variação do produto.
                 item_original.variacao_produto.estoque += item_original.quantidade
                 item_original.variacao_produto.save()
 
-        # Depois, lidamos com os itens que foram adicionados ou alterados
-        for form_item in formset.initial_forms:
-            if form_item.has_changed():
-                item_alterado = form_item.instance
-                quantidade_antiga = form_item.initial.get('quantidade', 0)
-                quantidade_nova = form_item.cleaned_data.get('quantidade', 0)
+        # ETAPA 2: Lidar com itens que foram alterados (não removidos nem novos).
+        # `formset.initial_forms` contém os formulários de itens que já existiam no pedido.
+        instances = formset.save(commit=False)
+        for instance in instances:
+             if instance.pk: # Se o item já existe (edição)
+                quantidade_antiga = ItemPedido.objects.get(pk=instance.pk).quantidade
+                quantidade_nova = instance.quantidade
                 diferenca = quantidade_nova - quantidade_antiga
-                
-                # Validação de estoque
-                if item_alterado.variacao_produto.estoque < diferenca:
-                    # Idealmente, aqui mostrariamos uma mensagem de erro ao utilizador
-                    # Por agora, simplesmente não permitimos a alteração
-                    continue 
-                
-                # Ajusta o estoque com a diferença
-                item_alterado.variacao_produto.estoque -= diferenca
-                item_alterado.variacao_produto.save()
-        
-        # Finalmente, lidamos com os itens novos
-        for form_item in formset.new_forms:
-            if form_item.is_valid() and form_item.cleaned_data.get('variacao_produto'):
-                item_novo = form_item.instance
-                quantidade_nova = form_item.cleaned_data.get('quantidade', 0)
-                
-                # Validação de stock
-                if item_novo.variacao_produto.estoque < quantidade_nova:
-                    continue # Não permite a venda
-                
-                # Dá baixa do stock
-                item_novo.variacao_produto.estoque -= quantidade_nova
-                item_novo.variacao_produto.save()
 
-        # Salva todas as alterações no formset (itens e parcelas)
+                # Validação de stock: só verificamos se a diferença for positiva (tentativa de retirar mais).
+                if instance.variacao_produto.estoque < diferenca:
+                    # Se não houver stock suficiente para cobrir a diferença, ignoramos esta alteração.
+                    continue
+                
+                # Se houver stock, ajustamos o stock com a diferença calculada.
+                instance.variacao_produto.estoque -= diferenca
+                instance.variacao_produto.save()
+        
+        # ETAPA 3: Lidar com itens completamente novos que foram adicionados.
+        # `formset.new_forms` não é fiável aqui, por isso iteramos sobre as instâncias sem pk
+        for instance in instances:
+            if not instance.pk: # Se é um item novo
+                # Validação de stock simples: a quantidade nova não pode ser maior que o stock total.
+                if instance.variacao_produto.estoque < instance.quantidade:
+                    continue # Ignora este novo item se não houver stock.
+                
+                # Dá baixa da quantidade total do novo item no stock.
+                instance.variacao_produto.estoque -= instance.quantidade
+                instance.variacao_produto.save()
+
+        # Depois de toda a lógica de stock, salvamos as alterações no formset.
+        formset.save()
         super().save_formset(request, form, formset, change)
 
-        # Revalidação do valor total do pedido
+        # Revalidação final do valor total do pedido para garantir consistência.
         pedido = form.instance
         valor_calculado = sum(item.quantidade * item.preco_unitario for item in pedido.itens.all())
         if pedido.valor_total != valor_calculado:
