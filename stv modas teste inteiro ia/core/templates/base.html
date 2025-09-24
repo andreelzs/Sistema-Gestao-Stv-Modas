@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}STV Modas{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+</head>
+<body>
+    <header>
+        <a href="{% url 'core:home' %}" class="site-title"><h1>STV Modas</h1></a>
+        <nav>
+            <ul>
+                {% if user.is_authenticated %}
+                    <li><span>Olá, {{ user.username }}!</span></li>
+                    {% if user.is_staff %}
+                        <li><a href="{% url 'dashboard:dashboard_view' %}">Dashboard</a></li>
+                        <li><a href="{% url 'dashboard:lista_produtos' %}">Gerenciar Produtos</a></li>
+                        <li><a href="{% url 'dashboard:lista_clientes' %}">Gerenciar Clientes</a></li>
+                        <li><a href="{% url 'dashboard:lista_pedidos' %}">Gerenciar Pedidos</a></li>
+                    {% endif %}
+                    <li><a href="{% url 'clientes:minha_conta' %}">Minha Conta</a></li>
+                    <li><a href="{% url 'contas:logout' %}">Sair</a></li>
+                {% else %}
+                    <li><a href="{% url 'contas:login' %}">Login</a></li>
+                    <li><a href="{% url 'contas:register' %}">Registrar</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+</html>

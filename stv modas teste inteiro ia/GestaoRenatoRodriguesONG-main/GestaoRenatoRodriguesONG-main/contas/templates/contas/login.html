@@ -1,0 +1,69 @@
+{% extends "core/base.html" %}
+
+{% block title %}Login - {{ block.super }}{% endblock title %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+  <div class="col-md-6 col-lg-4">
+    <div class="card shadow">
+      <div class="card-body">
+        <h2 class="card-title text-center mb-4">Entrar no Sistema</h2>
+        {% if form.errors %}
+        <div class="alert alert-danger" role="alert">
+          Seu nome de usuário e senha não correspondem. Tente novamente.
+        </div>
+        {% endif %} {% if next %} {% if user.is_authenticated %}
+        <div class="alert alert-warning" role="alert">
+          Sua conta não tem acesso a esta página. Para prosseguir, por favor,
+          faça login com uma conta que tenha acesso.
+        </div>
+        {% else %}
+        <div class="alert alert-info" role="alert">
+          Por favor, faça login para ver esta página.
+        </div>
+        {% endif %} {% endif %}
+
+        <form method="post" action="{% url 'contas:login' %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ next }}" />
+
+          <div class="mb-3">
+            <label for="id_username" class="form-label">Usuário:</label>
+            <input
+              type="text"
+              name="username"
+              autofocus
+              autocapitalize="none"
+              autocomplete="username"
+              maxlength="150"
+              class="form-control"
+              placeholder="Nome de usuário"
+              required
+              id="id_username"
+            />
+          </div>
+
+          <div class="mb-3">
+            <label for="id_password" class="form-label">Senha:</label>
+            <input
+              type="password"
+              name="password"
+              autocomplete="current-password"
+              class="form-control"
+              placeholder="Senha"
+              required
+              id="id_password"
+            />
+          </div>
+
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary btn-block">
+              Entrar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

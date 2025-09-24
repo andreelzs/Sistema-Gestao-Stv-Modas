@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}Registro - STV Modas{% endblock %}
+
+{% block content %}
+    <h2>Registro</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Registrar</button>
+    </form>
+    <p>Já tem uma conta? <a href="{% url 'contas:login' %}">Faça login aqui</a>.</p>
+{% endblock %}

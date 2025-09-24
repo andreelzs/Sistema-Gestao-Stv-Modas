@@ -1,0 +1,157 @@
+{% extends "core/base.html" %}
+
+{% block title %}{{ titulo_pagina }} - {{ block.super }}{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ titulo_pagina }}</h1>
+    <hr>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+        
+        {# Renderização manual dos campos para melhor controle da disposição #}
+        <div class="row">
+            <div class="col-md-8 mb-3">
+                {{ form.nome_completo.label_tag }}
+                {{ form.nome_completo }}
+                {% if form.nome_completo.errors %}<div class="invalid-feedback d-block">{{ form.nome_completo.errors|join:", " }}</div>{% endif %}
+            </div>
+            <div class="col-md-4 mb-3">
+                {{ form.data_nascimento.label_tag }}
+                {{ form.data_nascimento }}
+                {% if form.data_nascimento.errors %}<div class="invalid-feedback d-block">{{ form.data_nascimento.errors|join:", " }}</div>{% endif %}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                {{ form.genero.label_tag }}
+                {{ form.genero }}
+                {% if form.genero.errors %}<div class="invalid-feedback d-block">{{ form.genero.errors|join:", " }}</div>{% endif %}
+            </div>
+            <div class="col-md-4 mb-3">
+                {{ form.cpf.label_tag }}
+                {{ form.cpf }}
+                {% if form.cpf.errors %}<div class="invalid-feedback d-block">{{ form.cpf.errors|join:", " }}</div>{% endif %}
+            </div>
+            <div class="col-md-4 mb-3">
+                {{ form.rg.label_tag }}
+                {{ form.rg }}
+                {% if form.rg.errors %}<div class="invalid-feedback d-block">{{ form.rg.errors|join:", " }}</div>{% endif %}
+            </div>
+        </div>
+        
+        <hr>
+        <h5>Endereço</h5>
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                {{ form.cep.label_tag }}
+                {{ form.cep }}
+                {% if form.cep.errors %}<div class="invalid-feedback d-block">{{ form.cep.errors|join:", " }}</div>{% endif %}
+            </div>
+            <div class="col-md-9 mb-3">
+                {{ form.logradouro.label_tag }}
+                {{ form.logradouro }}
+                {% if form.logradouro.errors %}<div class="invalid-feedback d-block">{{ form.logradouro.errors|join:", " }}</div>{% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                {{ form.numero_endereco.label_tag }}
+                {{ form.numero_endereco }}
+                {% if form.numero_endereco.errors %}<div class="invalid-feedback d-block">{{ form.numero_endereco.errors|join:", " }}</div>{% endif %}
+            </div>
+            <div class="col-md-5 mb-3">
+                {{ form.complemento_endereco.label_tag }}
+                {{ form.complemento_endereco }}
+                {% if form.complemento_endereco.errors %}<div class="invalid-feedback d-block">{{ form.complemento_endereco.errors|join:", " }}</div>{% endif %}
+            </div>
+            <div class="col-md-4 mb-3">
+                {{ form.bairro.label_tag }}
+                {{ form.bairro }}
+                {% if form.bairro.errors %}<div class="invalid-feedback d-block">{{ form.bairro.errors|join:", " }}</div>{% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                {{ form.cidade.label_tag }}
+                {{ form.cidade }}
+                {% if form.cidade.errors %}<div class="invalid-feedback d-block">{{ form.cidade.errors|join:", " }}</div>{% endif %}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.estado.label_tag }}
+                {{ form.estado }}
+                {% if form.estado.errors %}<div class="invalid-feedback d-block">{{ form.estado.errors|join:", " }}</div>{% endif %}
+            </div>
+        </div>
+
+        <hr>
+        <h5>Contato</h5>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                {{ form.telefone_principal.label_tag }}
+                {{ form.telefone_principal }}
+                {% if form.telefone_principal.errors %}<div class="invalid-feedback d-block">{{ form.telefone_principal.errors|join:", " }}</div>{% endif %}
+            </div>
+            <div class="col-md-4 mb-3">
+                {{ form.telefone_secundario.label_tag }}
+                {{ form.telefone_secundario }}
+                {% if form.telefone_secundario.errors %}<div class="invalid-feedback d-block">{{ form.telefone_secundario.errors|join:", " }}</div>{% endif %}
+            </div>
+            <div class="col-md-4 mb-3">
+                {{ form.email.label_tag }}
+                {{ form.email }}
+                {% if form.email.errors %}<div class="invalid-feedback d-block">{{ form.email.errors|join:", " }}</div>{% endif %}
+            </div>
+        </div>
+
+        <hr>
+        <h5>Informações Socioeconômicas e Educacionais</h5>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                {{ form.escolaridade.label_tag }}
+                {{ form.escolaridade }}
+                {% if form.escolaridade.errors %}<div class="invalid-feedback d-block">{{ form.escolaridade.errors|join:", " }}</div>{% endif %}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.ocupacao.label_tag }}
+                {{ form.ocupacao }}
+                {% if form.ocupacao.errors %}<div class="invalid-feedback d-block">{{ form.ocupacao.errors|join:", " }}</div>{% endif %}
+            </div>
+        </div>
+        <div class="mb-3">
+            {{ form.renda_familiar_aproximada.label_tag }}
+            {{ form.renda_familiar_aproximada }}
+            {% if form.renda_familiar_aproximada.errors %}<div class="invalid-feedback d-block">{{ form.renda_familiar_aproximada.errors|join:", " }}</div>{% endif %}
+        </div>
+
+        <hr>
+        <h5>Outras Informações</h5>
+        <div class="mb-3">
+            {{ form.como_conheceu_ong.label_tag }}
+            {{ form.como_conheceu_ong }}
+            {% if form.como_conheceu_ong.errors %}<div class="invalid-feedback d-block">{{ form.como_conheceu_ong.errors|join:", " }}</div>{% endif %}
+        </div>
+        <div class="mb-3">
+            {{ form.observacoes.label_tag }}
+            {{ form.observacoes }}
+            {% if form.observacoes.errors %}<div class="invalid-feedback d-block">{{ form.observacoes.errors|join:", " }}</div>{% endif %}
+        </div>
+        <div class="mb-3 form-check">
+            {{ form.ativo }}
+            {{ form.ativo.label_tag }}
+            {% if form.ativo.errors %}<div class="invalid-feedback d-block">{{ form.ativo.errors|join:", " }}</div>{% endif %}
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Salvar
+            </button>
+            <a href="{% if beneficiario %}{% url 'beneficiarios:detalhar_beneficiario' beneficiario.id %}{% else %}{% url 'beneficiarios:listar_beneficiarios' %}{% endif %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock content %}
