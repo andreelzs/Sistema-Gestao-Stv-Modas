@@ -1,0 +1,87 @@
+.card {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    width: 350px;
+    text-align: center;
+    transition: transform 0.3s;
+}
+
+.avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 5px solid #fff;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    margin: -60px auto 1rem;
+}
+
+.name {
+    font-size: 1.8rem;
+    margin: 0;
+    color: #333;
+}
+
+.login {
+    font-size: 1rem;
+    color: #777;
+    margin-bottom: 1rem;
+}
+
+.bio {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 1.5rem;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 1.5rem;
+    padding: 1rem 0;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+}
+
+.stats div {
+    display: flex;
+    flex-direction: column;
+}
+
+.stats strong {
+    font-size: 1.2rem;
+}
+
+.stats span {
+    font-size: 0.8rem;
+    color: #777;
+}
+
+.favButton {
+    border: 2px solid #3498db;
+    background-color: transparent;
+    color: #3498db;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 100%;
+}
+
+.favButton:hover {
+    background-color: #3498db;
+    color: white;
+}
+
+.favButton.isFav {
+    background-color: #e74c3c;
+    border-color: #e74c3c;
+    color: white;
+}
+
+.favButton.isFav:hover {
+    background-color: #c0392b;
+    border-color: #c0392b;
+}

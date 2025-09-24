@@ -1,0 +1,30 @@
+.searchForm {
+    display: flex;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 50px;
+    overflow: hidden;
+}
+
+.searchInput {
+    border: none;
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+    width: 300px;
+    outline: none;
+}
+
+.searchButton {
+    border: none;
+    background-color: #3498db;
+    color: white;
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.searchButton:hover {
+    background-color: #2980b9;
+}

@@ -1,0 +1,63 @@
+.favoritesContainer {
+    padding: 2rem;
+    text-align: center;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.favCard {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    padding: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.favCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.12);
+}
+
+.favCard img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.favCard h3 {
+    margin: 0.5rem 0;
+    cursor: pointer;
+    color: #333;
+}
+
+.favCard p {
+    margin: 0 0 1rem;
+    color: #777;
+    font-size: 0.9rem;
+}
+
+.favCard button {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.favCard button:hover {
+    background-color: #c0392b;
+}
+
+.emptyMessage {
+    text-align: center;
+    color: #777;
+    padding: 4rem;
+}
