@@ -4,7 +4,17 @@ from .models import ProdutoBase, VariacaoProduto, ImagemProduto, Categoria, Cor,
 class ProdutoBaseForm(forms.ModelForm):
     class Meta:
         model = ProdutoBase
-        fields = ['referencia', 'nome', 'descricao', 'categoria', 'preco_custo', 'preco_venda_padrao', 'ativo']
+        # Listamos os campos que devem aparecer no formulário
+        fields = [
+            'referencia',
+            'nome',
+            'descricao',
+            'categoria',
+            'preco_custo',
+            'preco_venda_padrao',
+            'ativo',
+        ]
+        # Podemos adicionar widgets para personalizar os campos, se necessário
         widgets = {
             'descricao': forms.Textarea(attrs={'rows': 3}),
         }
