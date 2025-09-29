@@ -1,5 +1,5 @@
 """
-URL configuration for gerenciamento_ong project.
+URL configuration for gestao_stv_modas project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.2/topics/http/urls/
@@ -15,14 +15,17 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include # Adicionar include
+from django.urls import path, include
+from produtos import views
 
 urlpatterns = [
+    path('', views.ProdutoListView.as_view(), name='listar_produtos'),
     path('admin/', admin.site.urls),
-    path('', include('core.urls')),
-    path('contas/', include('contas.urls')),
-    path('produtos/', include('produtos.urls')),  # ALTERADO
-    path('clientes/', include('clientes.urls')),  # ALTERADO
-    path('pedidos/', include('pedidos.urls')),   # ALTERADO
-    path('dashboard/', include('dashboard.urls')),
+    path('pedidos/', include('pedidos.urls', namespace='pedidos')),
+    path('', include('core.urls', namespace='core')), # Incluir as URLs do app core
+    path('contas/', include('contas.urls', namespace='contas')), # Incluir as URLs do app contas
+    path('clientes/', include('clientes.urls', namespace='clientes')), # Incluir as URLs do app clientes
+    path('dashboard/', include('dashboard.urls', namespace='dashboard')), # Incluir as URLs do app dashboard
+    path('produtos/', include('produtos.urls')), # Incluir as URLs do app produtos
+    path('adicionar/', views.ProdutoCreateView.as_view(), name='adicionar_produto') # Incluir as URLs do app produtos
 ]

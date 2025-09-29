@@ -4,5 +4,5 @@ from . import views
 app_name = 'clientes'
 
 urlpatterns = [
-    # As URLs para listar, criar, editar clientes virão aqui no futuro.
+    path('minha-conta/', views.minha_conta, name='minha_conta'),
 ]

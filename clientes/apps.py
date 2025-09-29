@@ -1,5 +1,6 @@
 from django.apps import AppConfig
 
-class ClientesConfig(AppConfig):  # ALTERADO DE VoluntariosConfig
+
+class ClientesConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'clientes'             # ALTERADO DE voluntarios
+    name = 'clientes'
