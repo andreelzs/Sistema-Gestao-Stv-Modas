@@ -17,6 +17,7 @@
                     <th>Referência</th>
                     <th>Nome</th>
                     <th>Categoria</th>
+                    <th>Marca</th>
                     <th>Preço de Venda</th>
                     <th class="text-center">Ações</th>
                 </tr>
@@ -27,6 +28,7 @@
                     <td>{{ produto.referencia|default:"N/A" }}</td>
                     <td>{{ produto.nome }}</td>
                     <td>{{ produto.categoria.nome }}</td>
+                    <td>{{ produto.marca.nome|default:"N/A" }}</td>
                     <td>R$ {{ produto.preco_venda_padrao|floatformat:2 }}</td>
                     <td class="text-center">
                         <a href="#" class="btn btn-sm btn-info" title="Ver Detalhes">
@@ -42,7 +44,7 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" class="text-center">Nenhum produto ativo encontrado.</td>
+                    <td colspan="6" class="text-center">Nenhum produto ativo encontrado.</td>
                 </tr>
                 {% endfor %}
             </tbody>

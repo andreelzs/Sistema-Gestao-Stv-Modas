@@ -18,11 +18,18 @@ class Categoria(models.Model):
     def __str__(self):
         return self.nome
 
+class Marca(models.Model):
+    nome = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.nome
+
 class ProdutoBase(models.Model):
     referencia = models.CharField(max_length=50, unique=True, blank=True, null=True)
     nome = models.CharField(max_length=255)
     descricao = models.TextField(blank=True, null=True)
     categoria = models.ForeignKey(Categoria, on_delete=models.PROTECT)
+    marca = models.ForeignKey(Marca, on_delete=models.PROTECT, blank=True, null=True)
     preco_custo = models.DecimalField(max_digits=10, decimal_places=2)
     preco_venda_padrao = models.DecimalField(max_digits=10, decimal_places=2)
     ativo = models.BooleanField(default=True)

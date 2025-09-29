@@ -10,6 +10,7 @@ class ProdutoBaseForm(forms.ModelForm):
             'nome',
             'descricao',
             'categoria',
+            'marca',
             'preco_custo',
             'preco_venda_padrao',
             'ativo',
