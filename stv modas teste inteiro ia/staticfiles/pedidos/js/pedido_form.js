@@ -178,12 +178,12 @@
                 h2.append(dataPrimeiraParcelaInput);
                 h2.append(gerarParcelasBtn);
             }
-        }
-        
-        gerarParcelasBtn.on('click', function() {
-            const numParcelas = parseInt(numeroParcelasInput.val());
-            const dataPrimeiraStr = dataPrimeiraParcelaInput.val();
-            const valorTotal = getValorTotalPedido();
+                $(this).find('input[name$="-DELETE"]').prop('checked', true).trigger('change');
+            });
+
+            const parcelasTotalForms = $(`#id_parcelas-TOTAL_FORMS`);
+            let currentParcelaIndex = parseInt(parcelasTotalForms.val());
+
 
             if (isNaN(numParcelas) || numParcelas <= 0 || !dataPrimeiraStr || isNaN(valorTotal) || valorTotal <= 0) {
                 alert('Por favor, preencha o número de parcelas, a data da primeira parcela e o valor total do pedido (que deve ser maior que zero).');

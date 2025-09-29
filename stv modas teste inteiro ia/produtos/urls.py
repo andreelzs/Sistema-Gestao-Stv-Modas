@@ -13,6 +13,11 @@ urlpatterns = [
 
     # URL para adicionar um novo produto.
     path('adicionar/', views.ProdutoCreateView.as_view(), name='adicionar_produto'),
+    
+    # URLs para adicionar cor, marca e categoria via AJAX
+    path('adicionar-cor-ajax/', views.adicionar_cor_ajax, name='adicionar_cor_ajax'),
+    path('adicionar-marca-ajax/', views.adicionar_marca_ajax, name='adicionar_marca_ajax'),
+    path('adicionar-categoria-ajax/', views.adicionar_categoria_ajax, name='adicionar_categoria_ajax'),
 
     # Futuramente, adicionaremos as URLs para editar e arquivar produtos aqui.
 ]

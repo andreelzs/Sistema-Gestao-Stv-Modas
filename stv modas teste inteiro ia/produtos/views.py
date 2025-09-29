@@ -3,8 +3,13 @@
 from django.views.generic import ListView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from .models import ProdutoBase
-from .forms import ProdutoBaseForm
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.views import View
+import json
+from .models import ProdutoBase, Cor, Marca, Categoria
+from .forms import ProdutoBaseForm, VariacaoProdutoFormSet, ImagemProdutoFormSet
 
 class ProdutoListView(LoginRequiredMixin, ListView):
     """
@@ -39,4 +44,129 @@ class ProdutoCreateView(LoginRequiredMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = "Adicionar Novo Produto"
+        
+        # Adicionar formsets ao contexto se não estiverem no POST
+        if self.request.POST:
+            context['variacoes_formset'] = VariacaoProdutoFormSet(self.request.POST, self.request.FILES, instance=self.object)
+            context['imagens_formset'] = ImagemProdutoFormSet(self.request.POST, self.request.FILES, instance=self.object)
+        else:
+            context['variacoes_formset'] = VariacaoProdutoFormSet(instance=self.object)
+            context['imagens_formset'] = ImagemProdutoFormSet(instance=self.object)
+            
         return context
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        variacoes_formset = context['variacoes_formset']
+        imagens_formset = context['imagens_formset']
+        
+        # Verificar se os formsets são válidos
+        if variacoes_formset.is_valid() and imagens_formset.is_valid():
+            # Salvar o produto base
+            self.object = form.save()
+            
+            # Salvar as variações
+            variacoes_formset.instance = self.object
+            variacoes_formset.save()
+            
+            # Salvar as imagens
+            imagens_formset.instance = self.object
+            imagens_formset.save()
+            
+            return super().form_valid(form)
+        else:
+            # Se algum formset não é válido, retornar ao formulário com erros
+            return self.render_to_response(self.get_context_data(form=form))
+
+@csrf_exempt
+def adicionar_cor_ajax(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            nome_cor = data.get('nome')
+            
+            # Verificar se a cor já existe
+            cor, created = Cor.objects.get_or_create(nome=nome_cor)
+            
+            if created:
+                return JsonResponse({
+                    'success': True,
+                    'id': cor.id,
+                    'nome': cor.nome
+                })
+            else:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Cor já existe'
+                })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            })
+    return JsonResponse({
+        'success': False,
+        'error': 'Método não permitido'
+    })
+
+@csrf_exempt
+def adicionar_marca_ajax(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            nome_marca = data.get('nome')
+
+            # Verificar se a marca já existe
+            marca, created = Marca.objects.get_or_create(nome=nome_marca)
+
+            if created:
+                return JsonResponse({
+                    'success': True,
+                    'id': marca.id,
+                    'nome': marca.nome
+                })
+            else:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Marca já existe'
+                })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            })
+    return JsonResponse({
+        'success': False,
+        'error': 'Método não permitido'
+    })
+
+@csrf_exempt
+def adicionar_categoria_ajax(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            nome_categoria = data.get('nome')
+
+            # Verificar se a categoria já existe
+            categoria, created = Categoria.objects.get_or_create(nome=nome_categoria)
+
+            if created:
+                return JsonResponse({
+                    'success': True,
+                    'id': categoria.id,
+                    'nome': categoria.nome
+                })
+            else:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Categoria já existe'
+                })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            })
+    return JsonResponse({
+        'success': False,
+        'error': 'Método não permitido'
+    })
