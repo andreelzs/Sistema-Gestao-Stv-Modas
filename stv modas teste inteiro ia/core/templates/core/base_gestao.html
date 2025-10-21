@@ -11,9 +11,14 @@
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+{% if request.path != '/contas/login/' %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+{% endif %}
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">STV Modas - Gestão</a>
+<a class="navbar-brand" href="#">
+                <img src="{% static 'logoStvModas.jpg' %}" alt="Logo STV Modas" class="img-fluid" style="max-height: 40px; margin-right: 10px">
+                STV Modas - Gestão
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -35,14 +40,16 @@
                         <a class="nav-link" href="{% url 'admin:index' %}" target="_blank">Admin Django</a>
                     </li>
                      <li class="nav-item">
-                        <a class="nav-link" href="#">Sair</a>
+<a class="nav-link" href="{% url 'contas:logout' %}">Sair</a>
                     </li>
                 </ul>
             </div>
         </div>
-    </nav>
+{% if request.path != '/contas/login/' %}
+</nav>
+{% endif %}
 
-    <div class="container mt-4">
+<div class="container mt-2">
         {% block content %}
         {% endblock %}
     </div>

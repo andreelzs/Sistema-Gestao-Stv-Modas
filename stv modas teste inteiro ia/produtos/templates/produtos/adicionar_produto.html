@@ -63,6 +63,9 @@
                             <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#novaCategoriaModal">
                                 <i class="fas fa-plus"></i> Nova Categoria
                             </button>
+                            <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#novoTamanhoModal">
+                                <i class="fas fa-plus"></i> Novo Tamanho
+                            </button>
                         </div>
                     </div>
                     
@@ -166,6 +169,27 @@
                         <input type="text" class="form-control" id="nome-categoria" required>
                     </div>
                     <button type="submit" class="btn btn-primary">Salvar Categoria</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Novo Tamanho -->
+<div class="modal fade" id="novoTamanhoModal" tabindex="-1" aria-labelledby="novoTamanhoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="novoTamanhoModalLabel">Adicionar Novo Tamanho</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="novo-tamanho-form">
+                    <div class="mb-3">
+                        <label for="nome-tamanho" class="form-label">Nome do Tamanho</label>
+                        <input type="text" class="form-control" id="nome-tamanho" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Salvar Tamanho</button>
                 </form>
             </div>
         </div>

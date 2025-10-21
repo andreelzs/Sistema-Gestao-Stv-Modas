@@ -1,139 +1,203 @@
 // Função para adicionar nova cor via AJAX
 function adicionarCor() {
-    document.getElementById('nova-cor-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const nomeCor = document.getElementById('nome-cor').value;
-        
-        fetch('{% url "produtos:adicionar_cor_ajax" %}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-            },
-            body: JSON.stringify({nome: nomeCor})
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Adicionar a nova cor a todos os selects de cor existentes
-                const corSelects = document.querySelectorAll('select[id$="-cor"]');
-                corSelects.forEach(select => {
-                    const option = new Option(data.nome, data.id);
-                    select.add(option);
-                    // Selecionar a nova cor apenas no último select (mais recente)
-                    if (select === corSelects[corSelects.length - 1]) {
-                        select.value = data.id;
+    const form = document.getElementById('nova-cor-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const nomeCor = document.getElementById('nome-cor').value;
+            
+            fetch('/produtos/adicionar-cor-ajax/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                },
+                body: JSON.stringify({nome: nomeCor})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Adicionar a nova cor a todos os selects de cor existentes
+                    const corSelects = document.querySelectorAll('select[id$="-cor"]');
+                    corSelects.forEach(select => {
+                        const option = new Option(data.nome, data.id);
+                        select.add(option);
+                    });
+
+                    // Fechar o modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('novaCorModal'));
+                    if (modal) {
+                        modal.hide();
                     }
-                });
 
-                // Fechar o modal
-                bootstrap.Modal.getInstance(document.getElementById('novaCorModal')).hide();
+                    // Limpar o formulário
+                    document.getElementById('nova-cor-form').reset();
 
-                // Limpar o formulário
-                document.getElementById('nova-cor-form').reset();
-
-                // Mostrar mensagem de sucesso
-                alert('Cor adicionada com sucesso!');
-            } else {
-                alert('Erro ao adicionar cor: ' + data.error);
-            }
-        })
-        .catch(error => {
-            console.error('Erro:', error);
-            alert('Erro ao adicionar cor');
+                    // Mostrar mensagem de sucesso
+                    alert('Cor adicionada com sucesso!');
+                } else {
+                    alert('Erro ao adicionar cor: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao adicionar cor');
+            });
         });
-    });
+    }
 }
 
 // Função para adicionar nova marca via AJAX
 function adicionarMarca() {
-    document.getElementById('nova-marca-form').addEventListener('submit', function(e) {
-        e.preventDefault();
+    const form = document.getElementById('nova-marca-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
 
-        const nomeMarca = document.getElementById('nome-marca').value;
+            const nomeMarca = document.getElementById('nome-marca').value;
 
-        fetch('{% url "produtos:adicionar_marca_ajax" %}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-            },
-            body: JSON.stringify({nome: nomeMarca})
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Adicionar a nova marca ao select
-                const marcaSelect = document.querySelector('#id_marca');
-                if (marcaSelect) {
-                    const option = new Option(data.nome, data.id);
-                    marcaSelect.add(option);
-                    marcaSelect.value = data.id;
+            fetch('/produtos/adicionar-marca-ajax/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                },
+                body: JSON.stringify({nome: nomeMarca})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Adicionar a nova marca ao select
+                    const marcaSelect = document.querySelector('#id_marca');
+                    if (marcaSelect) {
+                        const option = new Option(data.nome, data.id);
+                        marcaSelect.add(option);
+                        marcaSelect.value = data.id;
+                    }
+
+                    // Fechar o modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('novaMarcaModal'));
+                    if (modal) {
+                        modal.hide();
+                    }
+
+                    // Limpar o formulário
+                    document.getElementById('nova-marca-form').reset();
+
+                    // Mostrar mensagem de sucesso
+                    alert('Marca adicionada com sucesso!');
+                } else {
+                    alert('Erro ao adicionar marca: ' + data.error);
                 }
-
-                // Fechar o modal
-                bootstrap.Modal.getInstance(document.getElementById('novaMarcaModal')).hide();
-
-                // Limpar o formulário
-                document.getElementById('nova-marca-form').reset();
-
-                // Mostrar mensagem de sucesso
-                alert('Marca adicionada com sucesso!');
-            } else {
-                alert('Erro ao adicionar marca: ' + data.error);
-            }
-        })
-        .catch(error => {
-            console.error('Erro:', error);
-            alert('Erro ao adicionar marca');
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao adicionar marca');
+            });
         });
-    });
+    }
 }
 
 // Função para adicionar nova categoria via AJAX
 function adicionarCategoria() {
-    document.getElementById('nova-categoria-form').addEventListener('submit', function(e) {
-        e.preventDefault();
+    const form = document.getElementById('nova-categoria-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
 
-        const nomeCategoria = document.getElementById('nome-categoria').value;
+            const nomeCategoria = document.getElementById('nome-categoria').value;
 
-        fetch('{% url "produtos:adicionar_categoria_ajax" %}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-            },
-            body: JSON.stringify({nome: nomeCategoria})
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Adicionar a nova categoria ao select
-                const categoriaSelect = document.querySelector('#id_categoria');
-                if (categoriaSelect) {
-                    const option = new Option(data.nome, data.id);
-                    categoriaSelect.add(option);
-                    categoriaSelect.value = data.id;
+            fetch('/produtos/adicionar-categoria-ajax/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                },
+                body: JSON.stringify({nome: nomeCategoria})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Adicionar a nova categoria ao select
+                    const categoriaSelect = document.querySelector('#id_categoria');
+                    if (categoriaSelect) {
+                        const option = new Option(data.nome, data.id);
+                        categoriaSelect.add(option);
+                        categoriaSelect.value = data.id;
+                    }
+
+                    // Fechar o modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('novaCategoriaModal'));
+                    if (modal) {
+                        modal.hide();
+                    }
+
+                    // Limpar o formulário
+                    document.getElementById('nova-categoria-form').reset();
+
+                    // Mostrar mensagem de sucesso
+                    alert('Categoria adicionada com sucesso!');
+                } else {
+                    alert('Erro ao adicionar categoria: ' + data.error);
                 }
-
-                // Fechar o modal
-                bootstrap.Modal.getInstance(document.getElementById('novaCategoriaModal')).hide();
-
-                // Limpar o formulário
-                document.getElementById('nova-categoria-form').reset();
-
-                // Mostrar mensagem de sucesso
-                alert('Categoria adicionada com sucesso!');
-            } else {
-                alert('Erro ao adicionar categoria: ' + data.error);
-            }
-        })
-        .catch(error => {
-            console.error('Erro:', error);
-            alert('Erro ao adicionar categoria');
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao adicionar categoria');
+            });
         });
-    });
+    }
+}
+
+// Função para adicionar novo tamanho via AJAX
+function adicionarTamanho() {
+    const form = document.getElementById('novo-tamanho-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const nomeTamanho = document.getElementById('nome-tamanho').value;
+
+            fetch('/produtos/adicionar-tamanho-ajax/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                },
+                body: JSON.stringify({nome: nomeTamanho})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Adicionar o novo tamanho a todos os selects de tamanho existentes
+                    const tamanhoSelects = document.querySelectorAll('select[id$="-tamanho"]');
+                    tamanhoSelects.forEach(select => {
+                        const option = new Option(data.nome, data.id);
+                        select.add(option);
+                    });
+
+                    // Fechar o modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('novoTamanhoModal'));
+                    if (modal) {
+                        modal.hide();
+                    }
+
+                    // Limpar o formulário
+                    document.getElementById('novo-tamanho-form').reset();
+
+                    // Mostrar mensagem de sucesso
+                    alert('Tamanho adicionado com sucesso!');
+                } else {
+                    alert('Erro ao adicionar tamanho: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao adicionar tamanho');
+            });
+        });
+    }
 }
 
 // Função para adicionar novas variações dinamicamente
@@ -209,6 +273,7 @@ document.addEventListener('DOMContentLoaded', function() {
     adicionarCor();
     adicionarMarca();
     adicionarCategoria();
+    adicionarTamanho(); // Adicionando a função para novo tamanho
     adicionarVariacao();
     adicionarImagem();
 });
