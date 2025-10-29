@@ -170,3 +170,34 @@ def adicionar_categoria_ajax(request):
         'success': False,
         'error': 'Método não permitido'
     })
+
+@csrf_exempt
+def adicionar_tamanho_ajax(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            nome_tamanho = data.get('nome')
+
+            # Verificar se o tamanho já existe
+            tamanho, created = Tamanho.objects.get_or_create(nome=nome_tamanho)
+
+            if created:
+                return JsonResponse({
+                    'success': True,
+                    'id': tamanho.id,
+                    'nome': tamanho.nome
+                })
+            else:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Tamanho já existe'
+                })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            })
+    return JsonResponse({
+        'success': False,
+        'error': 'Método não permitido'
+    })

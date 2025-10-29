@@ -18,6 +18,7 @@ urlpatterns = [
     path('adicionar-cor-ajax/', views.adicionar_cor_ajax, name='adicionar_cor_ajax'),
     path('adicionar-marca-ajax/', views.adicionar_marca_ajax, name='adicionar_marca_ajax'),
     path('adicionar-categoria-ajax/', views.adicionar_categoria_ajax, name='adicionar_categoria_ajax'),
+    path('adicionar-tamanho-ajax/', views.adicionar_tamanho_ajax, name='adicionar_tamanho_ajax'),
 
     # Futuramente, adicionaremos as URLs para editar e arquivar produtos aqui.
 ]
