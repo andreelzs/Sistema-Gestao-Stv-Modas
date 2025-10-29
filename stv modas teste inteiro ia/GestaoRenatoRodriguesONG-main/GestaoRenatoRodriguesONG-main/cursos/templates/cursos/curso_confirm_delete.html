@@ -1,0 +1,51 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}{{ titulo_pagina|default:"Confirmar Exclusão" }}{% endblock title %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">{{ titulo_pagina }}</h4>
+                </div>
+                <div class="card-body">
+                    <p class="fs-5">
+                        Você tem certeza que deseja excluir o curso 
+                        <strong>"{{ curso.nome_curso }}"</strong>?
+                    </p>
+                    {% if curso.certificados.count > 0 %}
+                        <div class="alert alert-warning" role="alert">
+                            <strong>Atenção:</strong> Este curso possui {{ curso.certificados.count }} certificado(s) associado(s) a beneficiários.
+                            A exclusão de cursos com certificados vinculados foi bloqueada para proteger os dados. 
+                            Por favor, remova ou reatribua os certificados antes de tentar excluir este curso.
+                        </div>
+                    {% else %}
+                        <p class="text-danger fw-bold">Esta ação não poderá ser desfeita.</p>
+                    {% endif %}
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'cursos:listar_cursos_ong' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i> Cancelar
+                            </a>
+                            {% if curso.certificados.count == 0 %}
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash-alt me-1"></i> Sim, Excluir Curso
+                            </button>
+                            {% else %}
+                            <button type="submit" class="btn btn-danger" disabled>
+                                <i class="fas fa-trash-alt me-1"></i> Excluir Curso (Bloqueado)
+                            </button>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

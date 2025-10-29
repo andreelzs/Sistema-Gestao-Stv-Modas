@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if form.instance.pk %}Editar Pedido{% else %}Adicionar Pedido{% endif %} - STV Modas
+{% endblock %}
+
+{% block content %}
+    <h2>{% if form.instance.pk %}Editar Pedido{% else %}Adicionar Novo Pedido{% endif %}</h2>
+    <p><a href="{% url 'dashboard:lista_pedidos' %}" class="button">Voltar para a Lista de Pedidos</a></p>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="button">Salvar Pedido</button>
+    </form>
+{% endblock %}

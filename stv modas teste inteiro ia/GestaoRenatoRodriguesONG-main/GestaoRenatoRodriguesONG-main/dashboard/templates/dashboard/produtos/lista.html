@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Gerenciar Produtos - STV Modas{% endblock %}
+
+{% block content %}
+    <h2>Gerenciar Produtos</h2>
+    <p><a href="{% url 'dashboard:dashboard_view' %}" class="button">Voltar para o Dashboard</a></p>
+
+    <p><a href="{% url 'dashboard:add_produto' %}" class="button">Adicionar Novo Produto</a></p>
+
+    {% if produtos %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Referência</th>
+                    <th>Categoria</th>
+                    <th>Preço Padrão</th>
+                    <th>Ativo</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for produto in produtos %}
+                    <tr>
+                        <td>{{ produto.nome }}</td>
+                        <td>{{ produto.referencia|default:"-" }}</td>
+                        <td>{{ produto.categoria.nome }}</td>
+                        <td>R$ {{ produto.preco_venda_padrao|floatformat:2 }}</td>
+                        <td>{% if produto.ativo %}Sim{% else %}Não{% endif %}</td>
+                        <td>
+                            <a href="{% url 'dashboard:edit_produto' produto.id %}" class="button">Editar</a>
+                            <a href="{% url 'dashboard:delete_produto' produto.id %}" class="button button-danger">Excluir</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nenhum produto cadastrado.</p>
+    {% endif %}
+
+    <style>
+        .button-danger {
+            background-color: #dc3545;
+            margin-left: 5px;
+        }
+        .button-danger:hover {
+            background-color: #c82333;
+        }
+    </style>
+{% endblock %}

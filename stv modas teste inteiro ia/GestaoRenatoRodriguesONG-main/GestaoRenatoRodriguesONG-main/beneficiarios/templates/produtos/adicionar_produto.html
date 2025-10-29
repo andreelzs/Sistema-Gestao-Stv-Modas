@@ -1,0 +1,178 @@
+{% extends "core/base_gestao.html" %}
+{% load crispy_forms_tags static %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">{{ titulo }}</h2>
+    </div>
+    <div class="card-body">
+        <form method="post" id="produto-form">
+            {% csrf_token %}
+            
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form|crispy }}
+                    
+                    <!-- Seção de Variações -->
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Variações do Produto</h5>
+                        </div>
+                        <div class="card-body">
+                            {{ variacoes_formset.management_form }}
+                            <div id="variacoes-formset">
+                                {% for variacao_form in variacoes_formset %}
+                                    <div class="variacao-form mb-3 p-3 border rounded">
+                                        {% if variacao_form.non_field_errors %}
+                                            <div class="alert alert-danger">
+                                                {{ variacao_form.non_field_errors }}
+                                            </div>
+                                        {% endif %}
+                                        {% for hidden in variacao_form.hidden_fields %}
+                                            {{ hidden }}
+                                        {% endfor %}
+                                        {% for field in variacao_form.visible_fields %}
+                                            <div class="mb-2">
+                                                {{ field.label_tag }}
+                                                {{ field|as_crispy_field }}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <button type="button" id="add-variacao" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-plus"></i> Adicionar Variação
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <!-- Botões para abrir os modais -->
+                    <div class="mb-3">
+                        <label class="form-label">Ações Adicionais</label>
+                        <div>
+                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#novaCorModal">
+                                <i class="fas fa-plus"></i> Nova Cor
+                            </button>
+                            <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#novaMarcaModal">
+                                <i class="fas fa-plus"></i> Nova Marca
+                            </button>
+                            <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#novaCategoriaModal">
+                                <i class="fas fa-plus"></i> Nova Categoria
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Seção de Imagens -->
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Imagens do Produto</h5>
+                        </div>
+                        <div class="card-body">
+                            {{ imagens_formset.management_form }}
+                            <div id="imagens-formset">
+                                {% for imagem_form in imagens_formset %}
+                                    <div class="imagem-form mb-3 p-3 border rounded">
+                                        {% if imagem_form.non_field_errors %}
+                                            <div class="alert alert-danger">
+                                                {{ imagem_form.non_field_errors }}
+                                            </div>
+                                        {% endif %}
+                                        {% for hidden in imagem_form.hidden_fields %}
+                                            {{ hidden }}
+                                        {% endfor %}
+                                        {% for field in imagem_form.visible_fields %}
+                                            <div class="mb-2">
+                                                {{ field.label_tag }}
+                                                {{ field|as_crispy_field }}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <button type="button" id="add-imagem" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-plus"></i> Adicionar Imagem
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <button type="submit" class="btn btn-success">Salvar Produto</button>
+                <a href="{% url 'produtos:listar_produtos' %}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal para Nova Cor -->
+<div class="modal fade" id="novaCorModal" tabindex="-1" aria-labelledby="novaCorModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="novaCorModalLabel">Adicionar Nova Cor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="nova-cor-form">
+                    <div class="mb-3">
+                        <label for="nome-cor" class="form-label">Nome da Cor</label>
+                        <input type="text" class="form-control" id="nome-cor" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Salvar Cor</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Nova Marca -->
+<div class="modal fade" id="novaMarcaModal" tabindex="-1" aria-labelledby="novaMarcaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="novaMarcaModalLabel">Adicionar Nova Marca</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="nova-marca-form">
+                    <div class="mb-3">
+                        <label for="nome-marca" class="form-label">Nome da Marca</label>
+                        <input type="text" class="form-control" id="nome-marca" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Salvar Marca</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Nova Categoria -->
+<div class="modal fade" id="novaCategoriaModal" tabindex="-1" aria-labelledby="novaCategoriaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="novaCategoriaModalLabel">Adicionar Nova Categoria</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="nova-categoria-form">
+                    <div class="mb-3">
+                        <label for="nome-categoria" class="form-label">Nome da Categoria</label>
+                        <input type="text" class="form-control" id="nome-categoria" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Salvar Categoria</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'produtos/js/produtos.js' %}"></script>
+{% endblock %}

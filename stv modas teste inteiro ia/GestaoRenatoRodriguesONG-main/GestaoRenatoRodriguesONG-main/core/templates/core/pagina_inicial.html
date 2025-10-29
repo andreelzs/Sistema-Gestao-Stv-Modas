@@ -1,0 +1,52 @@
+{% extends "core/base.html" %} {% block title %}Página Inicial - {{block.super}}{% endblock title %} {% block content %}
+<div class="container mt-5">
+  <div class="p-4 mb-4 bg-light rounded-3">
+    <div class="container-fluid py-3">
+      <h2 class="fw-bold">{{ titulo_pagina }}</h2> 
+      <p class="col-md-8 fs-5">{{ mensagem_boas_vindas }}</p> 
+      {% if not user.is_authenticated %}
+      <a href="{% url 'contas:login' %}" class="btn btn-primary btn-lg mt-3" type="button">Clique para logar</a>
+    {% endif %}
+    </div>
+  </div>
+
+  {# Cards com estatísticas rápidas - Adicionado apenas se o usuário estiver autenticado #}
+  {% if user.is_authenticated %}
+  <div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card text-white bg-primary h-100">
+            <div class="card-header">Voluntários Ativos</div>
+            <div class="card-body">
+                <h4 class="card-title">{{ total_voluntarios_ativos }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-white bg-success h-100">
+            <div class="card-header">Beneficiários Ativos</div>
+            <div class="card-body">
+                <h4 class="card-title">{{ total_beneficiarios_ativos }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-dark bg-warning h-100"> 
+            <div class="card-header">Tarefas Pendentes</div>
+            <div class="card-body">
+                <h4 class="card-title">{{ total_tarefas_pendentes }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-dark bg-info h-100">
+            <div class="card-header">Tarefas Concluídas no Último Mês</div>
+            <div class="card-body">
+                <h4 class="card-title">{{ total_tarefas_concluidas_ultimo_mes }}</h4>
+            </div>
+        </div>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock content %}

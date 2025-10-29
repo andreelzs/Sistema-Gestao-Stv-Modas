@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Gerenciar Clientes - STV Modas{% endblock %}
+
+{% block content %}
+    <h2>Gerenciar Clientes</h2>
+    <p><a href="{% url 'dashboard:dashboard_view' %}" class="button">Voltar para o Dashboard</a></p>
+
+    <p><a href="{% url 'dashboard:add_cliente' %}" class="button">Adicionar Novo Cliente</a></p>
+
+    {% if clientes %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome Completo</th>
+                    <th>Telefone</th>
+                    <th>Cidade</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cliente in clientes %}
+                    <tr>
+                        <td>{{ cliente.nome_completo }}</td>
+                        <td>{{ cliente.telefone }}</td>
+                        <td>{{ cliente.cidade }}</td>
+                        <td>
+                            <a href="{% url 'dashboard:edit_cliente' cliente.id %}" class="button">Editar</a>
+                            <a href="{% url 'dashboard:delete_cliente' cliente.id %}" class="button button-danger">Excluir</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nenhum cliente cadastrado.</p>
+    {% endif %}
+
+    <style>
+        .button-danger {
+            background-color: #dc3545;
+            margin-left: 5px;
+        }
+        .button-danger:hover {
+            background-color: #c82333;
+        }
+    </style>
+{% endblock %}
