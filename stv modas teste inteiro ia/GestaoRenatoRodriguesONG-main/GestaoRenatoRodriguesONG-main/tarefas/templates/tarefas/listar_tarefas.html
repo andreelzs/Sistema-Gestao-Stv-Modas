@@ -1,0 +1,184 @@
+{% extends "core/base.html" %}
+
+{% block title %}{{ titulo_pagina }} - {{ block.super }}{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>{{ titulo_pagina }}</h1>
+        <a href="{% url 'tarefas:cadastrar_tarefa' %}" class="btn btn-success">
+            <i class="fas fa-plus-circle"></i> Adicionar Nova Tarefa
+        </a>
+    </div>
+
+    {% comment %} Abas de Navegação {% endcomment %}
+    <ul class="nav nav-tabs mb-3">
+        <li class="nav-item">
+            <a class="nav-link {% if aba_atual == 'ativas' %}active{% endif %}" href="?aba=ativas{% if request.GET.q_titulo %}&q_titulo={{ request.GET.q_titulo|urlencode }}{% endif %}{% if request.GET.voluntario %}&voluntario={{ request.GET.voluntario|urlencode }}{% endif %}{% if request.GET.ordenar_por_prazo %}&ordenar_por_prazo={{ request.GET.ordenar_por_prazo|urlencode }}{% endif %}">Tarefas Ativas</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if aba_atual == 'concluidas' %}active{% endif %}" href="?aba=concluidas{% if request.GET.q_titulo %}&q_titulo={{ request.GET.q_titulo|urlencode }}{% endif %}{% if request.GET.voluntario %}&voluntario={{ request.GET.voluntario|urlencode }}{% endif %}">Tarefas Concluídas</a>
+        </li>
+    </ul>
+
+    <form method="get" class="row g-3 mb-4 p-3 border rounded bg-light align-items-end">
+        <input type="hidden" name="aba" value="{{ aba_atual }}"> {# Manter a aba atual ao submeter o filtro #}
+        <div class="col-md-4">
+            <label for="q_titulo" class="form-label">Pesquisar por Título:</label>
+            <input type="text" name="q_titulo" id="q_titulo" class="form-control" value="{{ termo_pesquisa_titulo_atual|default:'' }}">
+        </div>
+        {% if aba_atual == 'ativas' %}
+        <div class="col-md-3">
+            <label for="status" class="form-label">Filtrar por Status:</label>
+            <select name="status" id="status" class="form-select">
+                <option value="">Todos os Status (Ativas)</option>
+                {% for valor, texto in status_choices %}
+                <option value="{{ valor }}" {% if valor == filtro_status_atual %}selected{% endif %}>{{ texto }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+        <div class="col-md-3">
+            <label for="voluntario" class="form-label">Filtrar por Voluntário:</label>
+            <select name="voluntario" id="voluntario" class="form-select">
+                <option value="">Todos os Voluntários</option>
+                {% for voluntario in voluntarios_ativos %}
+                <option value="{{ voluntario.id }}" {% if voluntario.id == filtro_voluntario_atual %}selected{% endif %}>{{ voluntario.nome_completo }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search"></i> Pesquisar/Filtrar</button>
+        </div>
+    </form>
+
+    {% if page_obj.object_list %} 
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Título</th>
+                        <th>Status</th>
+                        <th>Prioridade</th>
+                        <th>Responsável</th>
+                        {% if aba_atual == 'ativas' %}
+                        <th>
+                            <a href="?aba=ativas{% if request.GET.q_titulo %}&q_titulo={{ request.GET.q_titulo|urlencode }}{% endif %}{% if filtro_status_atual %}&status={{ filtro_status_atual|urlencode }}{% endif %}{% if filtro_voluntario_atual %}&voluntario={{ filtro_voluntario_atual|urlencode }}{% endif %}{% if request.GET.page %}&page={{ request.GET.page|urlencode }}{% endif %}{% if ordenacao_prazo_atual == 'asc' %}&ordenar_por_prazo=desc{% elif ordenacao_prazo_atual == 'desc' %}{% else %}&ordenar_por_prazo=asc{% endif %}" class="text-white text-decoration-none">
+                                Prazo
+                                {% if ordenacao_prazo_atual == 'asc' %}
+                                    <i class="fas fa-sort-up ms-1"></i>
+                                {% elif ordenacao_prazo_atual == 'desc' %}
+                                    <i class="fas fa-sort-down ms-1"></i>
+                                {% else %}
+                                    <i class="fas fa-sort ms-1"></i>
+                                {% endif %}
+                            </a>
+                        </th>
+                        {% elif aba_atual == 'concluidas' %}
+                        <th>Data de Conclusão</th>
+                        {% endif %}
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tarefa in page_obj %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'tarefas:detalhar_tarefa' tarefa.id %}">
+                                {{ tarefa.titulo }}
+                            </a>
+                        </td>
+                        <td>
+                            <span class="badge 
+                                {% if tarefa.status == 'PEND' %}bg-warning text-dark{% endif %}
+                                {% if tarefa.status == 'FAZE' %}bg-info text-dark{% endif %}
+                                {% if tarefa.status == 'CONC' %}bg-success{% endif %}
+                                {% if tarefa.status == 'CANC' %}bg-secondary{% endif %}
+                            ">{{ tarefa.get_status_display }}</span>
+                        </td>
+                        <td>
+                            <span class="badge 
+                                {% if tarefa.prioridade == 4 %}bg-danger{% endif %}
+                                {% if tarefa.prioridade == 3 %}bg-warning text-dark{% endif %}
+                                {% if tarefa.prioridade == 2 %}bg-info text-dark{% endif %}
+                                {% if tarefa.prioridade == 1 %}bg-light text-dark{% endif %}
+                            ">{{ tarefa.get_prioridade_display }}</span>
+                        </td>
+                        <td>
+                            {% for voluntario in tarefa.voluntarios_responsaveis.all %}
+                                {{ voluntario.nome_completo }}{% if not forloop.last %}, {% endif %}
+                            {% empty %}
+                                Ninguém atribuído
+                            {% endfor %}
+                        </td>
+                        {% if aba_atual == 'ativas' %}
+                        <td>{{ tarefa.data_prevista_conclusao|date:"d/m/Y"|default:"Sem prazo" }}</td>
+                        {% elif aba_atual == 'concluidas' %}
+                        <td>{{ tarefa.data_conclusao_efetiva|date:"d/m/Y"|default:"Não registrada" }}</td>
+                        {% endif %}
+                        <td>
+                            <a href="{% url 'tarefas:editar_tarefa' tarefa.id %}" class="btn btn-sm btn-outline-primary me-1" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            {% if request.user.tipo_usuario == 'ADMIN' %}
+                            <a href="{% url 'tarefas:excluir_tarefa' tarefa.id %}" class="btn btn-sm btn-outline-danger" title="Excluir">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                            {% endif %}
+                            {# Botões para mudança rápida de status poderiam ser adicionados aqui #}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if is_paginated %}
+        <nav aria-label="Paginação de tarefas" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?aba={{ aba_atual }}&page={{ page_obj.previous_page_number }}{% if request.GET.q_titulo %}&q_titulo={{ request.GET.q_titulo|urlencode }}{% endif %}{% if filtro_status_atual and aba_atual == 'ativas' %}&status={{ filtro_status_atual|urlencode }}{% endif %}{% if filtro_voluntario_atual %}&voluntario={{ filtro_voluntario_atual|urlencode }}{% endif %}{% if ordenacao_prazo_atual and aba_atual == 'ativas' %}&ordenar_por_prazo={{ ordenacao_prazo_atual|urlencode }}{% endif %}" aria-label="Anterior">
+                    <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&laquo;</span>
+                </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li class="page-item active" aria-current="page"><span class="page-link">{{ num }}</span></li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item"><a class="page-link" href="?aba={{ aba_atual }}&page={{ num }}{% if request.GET.q_titulo %}&q_titulo={{ request.GET.q_titulo|urlencode }}{% endif %}{% if filtro_status_atual and aba_atual == 'ativas' %}&status={{ filtro_status_atual|urlencode }}{% endif %}{% if filtro_voluntario_atual %}&voluntario={{ filtro_voluntario_atual|urlencode }}{% endif %}{% if ordenacao_prazo_atual and aba_atual == 'ativas' %}&ordenar_por_prazo={{ ordenacao_prazo_atual|urlencode }}{% endif %}">{{ num }}</a></li>
+                {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?aba={{ aba_atual }}&page={{ page_obj.next_page_number }}{% if request.GET.q_titulo %}&q_titulo={{ request.GET.q_titulo|urlencode }}{% endif %}{% if filtro_status_atual and aba_atual == 'ativas' %}&status={{ filtro_status_atual|urlencode }}{% endif %}{% if filtro_voluntario_atual %}&voluntario={{ filtro_voluntario_atual|urlencode }}{% endif %}{% if ordenacao_prazo_atual and aba_atual == 'ativas' %}&ordenar_por_prazo={{ ordenacao_prazo_atual|urlencode }}{% endif %}" aria-label="Próxima">
+                    <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&raquo;</span>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            Nenhuma tarefa encontrada com os filtros atuais. 
+            {% if not filtro_status_atual and not filtro_voluntario_atual %}
+                <a href="{% url 'tarefas:cadastrar_tarefa' %}" class="alert-link">Clique aqui para adicionar a primeira tarefa!</a>
+            {% else %}
+                <a href="{% url 'tarefas:listar_tarefas' %}" class="alert-link">Limpar filtros e ver todas as tarefas.</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock content %}

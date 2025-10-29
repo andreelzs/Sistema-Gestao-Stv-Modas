@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Minha Conta - STV Modas{% endblock %}
+
+{% block content %}
+    <h2>Minha Conta - {{ request.user.username }}</h2>
+    <p>Bem-vindo(a), {{ cliente.nome_completo }}!</p>
+    <p>Telefone: {{ cliente.telefone }}</p>
+    <p>Endereço: {{ cliente.logradouro }}, {{ cliente.numero }} - {{ cliente.bairro }}, {{ cliente.cidade }} - {{ cliente.cep }}</p>
+
+    <h3>Meus Pedidos</h3>
+    {% if pedidos %}
+        <ul>
+            {% for pedido in pedidos %}
+                <li>
+                    Pedido #{{ pedido.id }} - Total: R$ {{ pedido.valor_total|floatformat:2 }} - Status: {{ pedido.get_status_display }}
+                    (<a href="{% url 'pedidos:detalhe_pedido' pedido.id %}">Ver Detalhes</a>)
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Você ainda não fez nenhum pedido.</p>
+    {% endif %}
+{% endblock %}

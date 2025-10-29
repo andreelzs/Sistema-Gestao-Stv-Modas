@@ -1,0 +1,33 @@
+{% extends "core/base.html" %}
+
+{% block title %}{{ titulo_pagina }} - {{ block.super }}{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-danger text-white">
+                    <h1 class="mb-0">{{ titulo_pagina }}</h1>
+                </div>
+                <div class="card-body">
+                    <p>Você tem certeza que deseja excluir a tarefa <strong>"{{ tarefa.titulo }}"</strong>?</p>
+                    <p class="text-danger"><small>Esta ação não poderá ser desfeita.</small></p>
+                    
+                    <form method="post" action="{% url 'tarefas:excluir_tarefa' tarefa.id %}">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{% url 'tarefas:detalhar_tarefa' tarefa.id %}" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash-alt"></i> Sim, Excluir
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
